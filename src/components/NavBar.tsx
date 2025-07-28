@@ -4,7 +4,8 @@ import { ModeToggle } from './ui/mode-toggle'
 
 const NavBar = () => {
   return (
-    <nav className='flex justify-between items-center py-4 px-20'>
+    <nav className='flex justify-between items-center py-4 px-4 sm:px-10 md:px-20'>
+
         
         <div className='flex gap-2'><WalletMinimal className='size-10' />
         

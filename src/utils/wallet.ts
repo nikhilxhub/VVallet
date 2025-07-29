@@ -20,7 +20,7 @@ export const handleGenerateWallet = ({
     setVisiblePhrases,
 
 }: GenerateWalletArgs) =>{
-        let mnemonic = mnemonicInput.trim();
+    let mnemonic = mnemonicInput.trim();
 
     if (mnemonic) {
       if (!validateMnemonic(mnemonic)) {
@@ -98,3 +98,8 @@ const generateWalletFromMnemonic = (
 
 
 };
+
+export const handleAddWallet = () =>{
+
+
+}

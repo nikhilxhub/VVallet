@@ -6,6 +6,8 @@ import { Input } from './ui/input';
 import { handleGenerateWallet } from '@/utils/wallet';
 import MnemonicDisplay from './MnemonicDisplay';
 import { copyToClipboard } from '@/utils/otherUtils';
+import { DisplayWallet } from './DisplayWallet';
+import path from 'path';
 
 const WalletGenerator = () => {
 
@@ -19,7 +21,14 @@ const WalletGenerator = () => {
     const [visiblePrivateKeys, setVisiblePrivateKeys] = useState<boolean[]>([]);
     const [visiblePhrases, setVisiblePhrases] = useState<boolean[]>([]);
     const [ showMnemonic, setShowMnemonic ] = useState<boolean>(false);
+    const [gridView, setGridView] = useState<boolean>(false);
 
+    const pathTypeNames: { [key: string]: string } = {
+        "501": "Solana",
+        "60": "Ethereum",
+    };
+    const pathTypeName = pathTypeNames[pathTypes[0]] || "";
+    
     const onGenerateWalletClick = () => {
     handleGenerateWallet({
       mnemonicInput,
@@ -112,6 +121,17 @@ const WalletGenerator = () => {
                 setShowMnemonic={setShowMnemonic} 
           />
 
+        )}
+
+        {/* display wallet pairs */}
+        {wallets.length > 0  && (
+
+            <DisplayWallet 
+                pathTypeName={pathTypeName}
+                wallets={wallets}
+                gridView = {gridView}
+                setGridView = {setGridView}
+            />
         )}
 
     </div>

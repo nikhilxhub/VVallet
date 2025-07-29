@@ -23,4 +23,12 @@ export interface MnemonicDisplayProps {
   showMnemonic: boolean;
   setShowMnemonic: (show: boolean) => void;
 }
+
+export interface DisplayWalletProps {
+    pathTypeName : string,
+    wallets :Wallet[],
+    gridView:boolean,
+    setGridView:(show: boolean) => void,
+    
+}
 // export const Wallet;

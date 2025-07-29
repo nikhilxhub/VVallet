@@ -6,6 +6,8 @@ export const copyToClipboard = (content: string) =>{
 
 }
 
-export const togglePrivateKeyVisibility = (index: number) =>{
-
-}
+// export const togglePrivateKeyVisibility = (index: number, visiblePrivateKeys ,setVisiblePrivateKeys:(show:string) => void) =>{
+//     setVisiblePrivateKeys(
+//         visiblePrivateKeys.map((visible:string, i: number) => (i === index ? !visible : visible))
+//     );
+// }

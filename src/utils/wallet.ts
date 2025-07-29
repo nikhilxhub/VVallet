@@ -1,4 +1,4 @@
-import { GenerateWalletArgs, handleAddWalletProps, Wallet } from "@/types/wallet";
+import { GenerateWalletArgs, handleAddWalletProps, handleClearWalletsProps, handleDeleteWalletsProps, Wallet } from "@/types/wallet";
 import { Keypair } from "@solana/web3.js";
 import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from "bip39";
 import { derivePath } from "ed25519-hd-key";
@@ -134,12 +134,48 @@ export const handleAddWallet = ({
 
 }
 
-export const handleClearWallets = () =>{
+export const handleClearWallets = ({
 
+  setWallets,
+  setMnemonicWords,
+  setPathTypes,
+  setVisiblePhrases,
+  setVisiblePrivateKeys,
+
+}:handleClearWalletsProps) =>{
+    localStorage.removeItem("wallets");
+    localStorage.removeItem("mnemonics");
+    localStorage.removeItem("paths");
+    setWallets([]);
+    setMnemonicWords([]);
+    setPathTypes([]);
+    setVisiblePrivateKeys([]);
+    setVisiblePhrases([]);
+    toast.success("All wallets cleared.");
 
 }
 
-export const handleDeleteWallets = (index: number) =>{
+export const handleDeleteWallets = ({
+  setWallets,
+  setPathTypes,
+  wallets,
+  pathTypes,
+  visiblePhrases,
+  setVisiblePhrases,
+  setVisiblePrivateKeys,
+  visiblePrivateKeys,
+  index,
 
+}: handleDeleteWalletsProps ) =>{
+    const updatedWallets = wallets.filter((_, i) => i !== index);
+    const updatedPathTypes = pathTypes.filter((_, i) => i !== index);
+
+    setWallets(updatedWallets);
+    setPathTypes(updatedPathTypes);
+    localStorage.setItem("wallets", JSON.stringify(updatedWallets));
+    localStorage.setItem("paths", JSON.stringify(updatedPathTypes));
+    setVisiblePrivateKeys(visiblePrivateKeys.filter((_, i) => i !== index));
+    setVisiblePhrases(visiblePhrases.filter((_, i) => i !== index));
+    toast.success("Wallet deleted successfully!");
 
 }

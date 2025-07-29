@@ -39,14 +39,37 @@ export interface DisplayWalletProps {
 
 export interface handleAddWalletProps {
   mnemonicWords:string[],
-    pathTypes:string[],
+  pathTypes:string[],
   wallets:Wallet[],
   setWallets:(wallets: Wallet[]) => void,
   visiblePrivateKeys: boolean[],
   visiblePhrases:boolean[],
-
+  
   setVisiblePrivateKeys: (show: boolean[]) => void,
   setVisiblePhrases: (show: boolean[]) => void,
+  
+}
+
+export interface handleClearWalletsProps {
+  setWallets:(wallets: Wallet[]) => void,
+  setMnemonicWords: (words: string[]) => void;
+  setPathTypes:(string: string[]) => void,
+  setVisiblePrivateKeys: (show: boolean[]) => void,
+  setVisiblePhrases: (show: boolean[]) => void,
+
+}
+
+export interface handleDeleteWalletsProps {
+  setWallets:(wallets: Wallet[]) => void,
+  wallets:Wallet[],
+  visiblePrivateKeys: boolean[],
+  visiblePhrases:boolean[],
+  pathTypes:string[],
+  setPathTypes:(string: string[]) => void,
+  setVisiblePrivateKeys: (show: boolean[]) => void,
+  setVisiblePhrases: (show: boolean[]) => void,
+  index: number,
+
 
 }
 // export const Wallet;

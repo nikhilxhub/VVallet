@@ -1,6 +1,6 @@
 "use client"
 import { Wallet } from '@/types/wallet'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { handleAddWallet, handleClearWallets, handleDeleteWallets, handleGenerateWallet } from '@/utils/wallet';
@@ -58,19 +58,43 @@ const WalletGenerator = () => {
 
     const onClearWallets = () =>{
         handleClearWallets({
-
+        setWallets,
+        setMnemonicWords,
+        setPathTypes,
+        setVisiblePhrases,
+        setVisiblePrivateKeys,
         })
 
     }
 
-    const onDeleteWallet = () =>{
+    const onDeleteWallet = (index: number) =>{
         handleDeleteWallets({
+        setWallets,
+        setPathTypes,
+        wallets,
+        pathTypes,
+        visiblePhrases,
+        setVisiblePhrases,
+        setVisiblePrivateKeys,
+        visiblePrivateKeys,
+        index,
 
-            
         })
 
-
     }
+    useEffect(() => {
+    const storedWallets = localStorage.getItem("wallets");
+    const storedMnemonic = localStorage.getItem("mnemonics");
+    const storedPathTypes = localStorage.getItem("paths");
+
+    if (storedWallets && storedMnemonic && storedPathTypes) {
+      setMnemonicWords(JSON.parse(storedMnemonic));
+      setWallets(JSON.parse(storedWallets));
+      setPathTypes(JSON.parse(storedPathTypes));
+      setVisiblePrivateKeys(JSON.parse(storedWallets).map(() => false));
+      setVisiblePhrases(JSON.parse(storedWallets).map(() => false));
+    }
+  }, []);
 
 
   return (

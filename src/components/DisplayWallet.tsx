@@ -6,7 +6,7 @@ import { Eye, EyeOff, Grid2X2, List, Trash } from 'lucide-react'
 import { handleAddWallet, handleClearWallets, handleDeleteWallets } from '@/utils/wallet'
 import { AlertDialog, AlertDialogFooter, AlertDialogHeader, AlertDialogTrigger } from './ui/alert-dialog'
 import { AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from '@radix-ui/react-alert-dialog'
-import { copyToClipboard, togglePrivateKeyVisibility } from '@/utils/otherUtils'
+import { copyToClipboard } from '@/utils/otherUtils'
 
 export const DisplayWallet = ({
     pathTypeName,
@@ -20,13 +20,18 @@ export const DisplayWallet = ({
     onDeleteWallet,
 
 }:DisplayWalletProps) => {
+  const togglePrivateKeyVisibility = (index: number) =>{
+    setVisiblePrivateKeys(
+        visiblePrivateKeys.map((visible, i) => (i === index ? !visible : visible))
+    );
+}
 
 
     
   return (
     <div className='flex flex-col'>
 
-        <div className='flex md:flex-row flex-col justify-between w-full gap-4 md:items-center'>
+        <div className='flex md:flex-row flex-col justify-between w-full gap-4 md:items-center py-3'>
 
             <h2 className='tracking-tight text-3xl md:text-4xl font-extrabold'>
                 {pathTypeName} Wallet

@@ -4,12 +4,36 @@ import React, { useState } from 'react'
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { handleGenerateWallet } from '@/utils/wallet';
+import MnemonicDisplay from './MnemonicDisplay';
+import { copyToClipboard } from '@/utils/otherUtils';
 
 const WalletGenerator = () => {
 
     const [wallets, setWallets ]= useState<Wallet[]>([]);
     const [pathTypes, setPathTypes] = useState<string[]>([]);
     const [mnemonicInput, setMnemonicInput] = useState<string>("");
+    const [ mnemonicWords, setMnemonicWords ] = useState<string[]>(
+        Array(12).fill(" ")
+    );
+
+    const [visiblePrivateKeys, setVisiblePrivateKeys] = useState<boolean[]>([]);
+    const [visiblePhrases, setVisiblePhrases] = useState<boolean[]>([]);
+    const [ showMnemonic, setShowMnemonic ] = useState<boolean>(false);
+
+    const onGenerateWalletClick = () => {
+    handleGenerateWallet({
+      mnemonicInput,
+      pathTypes,
+      wallets,
+      visiblePrivateKeys,
+      visiblePhrases,
+      setMnemonicWords,
+      setWallets,
+      setVisiblePrivateKeys,
+      setVisiblePhrases,
+    });
+    };
+
 
   return (
     <div className='flex flex-col py-4 px-4 sm:px-10 md:px-20'>
@@ -57,7 +81,7 @@ const WalletGenerator = () => {
                                         onChange={(e) =>  setMnemonicInput(e.target.value)}
                                 />
                                 <Button size={"lg"}
-                                        onClick={() => handleGenerateWallet()}
+                                        onClick={() => onGenerateWalletClick()}
 
                                 >
 
@@ -77,6 +101,18 @@ const WalletGenerator = () => {
         )}
 
         {/* need to display secret Phrase */}
+
+        {mnemonicWords && wallets.length > 0 && (
+
+            // mnemonic display here
+            <MnemonicDisplay
+                 mnemonicWords={mnemonicWords}
+                copyToClipboard={copyToClipboard}
+                showMnemonic={showMnemonic}
+                setShowMnemonic={setShowMnemonic} 
+          />
+
+        )}
 
     </div>
 

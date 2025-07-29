@@ -5,4 +5,22 @@ export interface Wallet {
     path: string,
 }
 
+export interface GenerateWalletArgs {
+  mnemonicInput: string;
+  pathTypes: string[];
+  wallets: Wallet[];
+  visiblePrivateKeys: boolean[];
+  visiblePhrases: boolean[];
+  setMnemonicWords: (words: string[]) => void;
+  setWallets: (wallets: Wallet[]) => void;
+  setVisiblePrivateKeys: (keys: boolean[]) => void;
+  setVisiblePhrases: (phrases: boolean[]) => void;
+}
+
+export interface MnemonicDisplayProps {
+  mnemonicWords: string[];
+  copyToClipboard: (text: string) => void;
+  showMnemonic: boolean;
+  setShowMnemonic: (show: boolean) => void;
+}
 // export const Wallet;

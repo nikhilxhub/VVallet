@@ -25,8 +25,9 @@ export interface MnemonicDisplayProps {
 }
 
 export interface DisplayWalletProps {
-    pathTypeName : string,
-    wallets :Wallet[],
+  pathTypeName : string,
+  wallets :Wallet[],
+  copyToClipboard: (text: string) => void;
     gridView:boolean,
     setGridView:(show: boolean) => void,
     visiblePrivateKeys: boolean[],

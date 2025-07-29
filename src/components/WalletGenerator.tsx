@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import { Wallet } from '@/types/wallet'
 import React, { useEffect, useState } from 'react'
 import { Button } from './ui/button';
@@ -7,7 +8,7 @@ import { handleAddWallet, handleClearWallets, handleDeleteWallets, handleGenerat
 import MnemonicDisplay from './MnemonicDisplay';
 import { copyToClipboard } from '@/utils/otherUtils';
 import { DisplayWallet } from './DisplayWallet';
-import path from 'path';
+
 
 const WalletGenerator = () => {
 
@@ -42,6 +43,7 @@ const WalletGenerator = () => {
         setVisiblePhrases,
         });
     };
+    
 
     const onAddWallet = () => {
         handleAddWallet({
@@ -189,6 +191,7 @@ const WalletGenerator = () => {
                 onAddWallet={onAddWallet}      // Pass the new handler
                 onClearWallets={onClearWallets}  // Pass the new handler
                 onDeleteWallet={onDeleteWallet}
+                copyToClipboard = {copyToClipboard}
             />
         )}
 

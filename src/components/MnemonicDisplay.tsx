@@ -1,3 +1,4 @@
+"use client"
 import { MnemonicDisplayProps } from '@/types/wallet'
 import React from 'react'
 import { Button } from './ui/button'

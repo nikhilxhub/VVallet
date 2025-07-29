@@ -1,12 +1,13 @@
-
+"use client"
 import { DisplayWalletProps, Wallet } from '@/types/wallet'
 import React from 'react'
 import { Button } from './ui/button'
 import { Eye, EyeOff, Grid2X2, List, Trash } from 'lucide-react'
-import { handleAddWallet, handleClearWallets, handleDeleteWallets } from '@/utils/wallet'
+// import { handleAddWallet, handleClearWallets, handleDeleteWallets } from '@/utils/wallet'
 import { AlertDialog, AlertDialogFooter, AlertDialogHeader, AlertDialogTrigger } from './ui/alert-dialog'
-import { AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from '@radix-ui/react-alert-dialog'
-import { copyToClipboard } from '@/utils/otherUtils'
+import { AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from './ui/alert-dialog'
+// import { copyToClipboard } from '@/utils/otherUtils'
+import { toast } from 'sonner'
 
 export const DisplayWallet = ({
     pathTypeName,
@@ -18,13 +19,22 @@ export const DisplayWallet = ({
     onAddWallet,
     onClearWallets,
     onDeleteWallet,
+    copyToClipboard,
 
 }:DisplayWalletProps) => {
   const togglePrivateKeyVisibility = (index: number) =>{
-    setVisiblePrivateKeys(
-        visiblePrivateKeys.map((visible, i) => (i === index ? !visible : visible))
-    );
-}
+      setVisiblePrivateKeys(
+          visiblePrivateKeys.map((visible, i) => (i === index ? !visible : visible))
+      );
+  }
+
+  // const copyToClipboard = (content: string) =>{
+  //     if(typeof window !== 'undefined'){
+  //         navigator.clipboard.writeText(content);
+  //         toast.success("Copied to clipboard!");
+  //     }
+
+  // }
 
 
     

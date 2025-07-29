@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
 import { Manrope } from "next/font/google";
+import { Toaster } from "sonner";
 const manrope = Manrope({ subsets: ["latin"] });
 
 // const geistSans = Geist({
@@ -36,6 +37,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <Toaster />
             {children}
           </ThemeProvider>
       </body>

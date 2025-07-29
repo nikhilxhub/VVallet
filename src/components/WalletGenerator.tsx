@@ -3,7 +3,7 @@ import { Wallet } from '@/types/wallet'
 import React, { useState } from 'react'
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { handleGenerateWallet } from '@/utils/wallet';
+import { handleAddWallet, handleClearWallets, handleDeleteWallets, handleGenerateWallet } from '@/utils/wallet';
 import MnemonicDisplay from './MnemonicDisplay';
 import { copyToClipboard } from '@/utils/otherUtils';
 import { DisplayWallet } from './DisplayWallet';
@@ -22,7 +22,7 @@ const WalletGenerator = () => {
     const [visiblePhrases, setVisiblePhrases] = useState<boolean[]>([]);
     const [ showMnemonic, setShowMnemonic ] = useState<boolean>(false);
     const [gridView, setGridView] = useState<boolean>(false);
-
+    
     const pathTypeNames: { [key: string]: string } = {
         "501": "Solana",
         "60": "Ethereum",
@@ -30,18 +30,47 @@ const WalletGenerator = () => {
     const pathTypeName = pathTypeNames[pathTypes[0]] || "";
     
     const onGenerateWalletClick = () => {
-    handleGenerateWallet({
-      mnemonicInput,
-      pathTypes,
-      wallets,
-      visiblePrivateKeys,
-      visiblePhrases,
-      setMnemonicWords,
-      setWallets,
-      setVisiblePrivateKeys,
-      setVisiblePhrases,
-    });
+        handleGenerateWallet({
+        mnemonicInput,
+        pathTypes,
+        wallets,
+        visiblePrivateKeys,
+        visiblePhrases,
+        setMnemonicWords,
+        setWallets,
+        setVisiblePrivateKeys,
+        setVisiblePhrases,
+        });
     };
+
+    const onAddWallet = () => {
+        handleAddWallet({
+            mnemonicWords,
+            pathTypes,
+            wallets,
+            setWallets,
+            visiblePrivateKeys,
+            setVisiblePrivateKeys,
+            visiblePhrases,
+            setVisiblePhrases,
+        });
+    };
+
+    const onClearWallets = () =>{
+        handleClearWallets({
+
+        })
+
+    }
+
+    const onDeleteWallet = () =>{
+        handleDeleteWallets({
+
+            
+        })
+
+
+    }
 
 
   return (
@@ -131,6 +160,11 @@ const WalletGenerator = () => {
                 wallets={wallets}
                 gridView = {gridView}
                 setGridView = {setGridView}
+                visiblePrivateKeys={visiblePrivateKeys}
+                setVisiblePrivateKeys={setVisiblePrivateKeys}
+                onAddWallet={onAddWallet}      // Pass the new handler
+                onClearWallets={onClearWallets}  // Pass the new handler
+                onDeleteWallet={onDeleteWallet}
             />
         )}
 

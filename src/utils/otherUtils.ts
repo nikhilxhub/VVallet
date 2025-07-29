@@ -5,3 +5,7 @@ export const copyToClipboard = (content: string) =>{
     toast.success("Copied to clipboard!");
 
 }
+
+export const togglePrivateKeyVisibility = (index: number) =>{
+
+}

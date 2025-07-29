@@ -1,4 +1,4 @@
-import { GenerateWalletArgs, Wallet } from "@/types/wallet";
+import { GenerateWalletArgs, handleAddWalletProps, Wallet } from "@/types/wallet";
 import { Keypair } from "@solana/web3.js";
 import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from "bip39";
 import { derivePath } from "ed25519-hd-key";
@@ -99,7 +99,47 @@ const generateWalletFromMnemonic = (
 
 };
 
-export const handleAddWallet = () =>{
+export const handleAddWallet = ({
+
+  mnemonicWords,
+  pathTypes,
+  wallets,
+  setWallets,
+  visiblePrivateKeys,
+  visiblePhrases,
+
+  setVisiblePrivateKeys,
+  setVisiblePhrases
+}:handleAddWalletProps) =>{
+  if (!mnemonicWords) {
+        toast.error("No mnemonic found. Please generate a wallet first.");
+        return;
+      }
+
+      const wallet = generateWalletFromMnemonic(
+        pathTypes[0],
+        mnemonicWords.join(" "),
+        wallets.length
+      );
+      if (wallet) {
+        const updatedWallets = [...wallets, wallet];
+        const updatedPathType = [pathTypes, pathTypes];
+        setWallets(updatedWallets);
+        localStorage.setItem("wallets", JSON.stringify(updatedWallets));
+        localStorage.setItem("pathTypes", JSON.stringify(updatedPathType));
+        setVisiblePrivateKeys([...visiblePrivateKeys, false]);
+        setVisiblePhrases([...visiblePhrases, false]);
+        toast.success("Wallet generated successfully!");
+      }
+
+}
+
+export const handleClearWallets = () =>{
+
+
+}
+
+export const handleDeleteWallets = (index: number) =>{
 
 
 }

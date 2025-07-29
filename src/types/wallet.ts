@@ -29,6 +29,24 @@ export interface DisplayWalletProps {
     wallets :Wallet[],
     gridView:boolean,
     setGridView:(show: boolean) => void,
-    
+    visiblePrivateKeys: boolean[],
+    setVisiblePrivateKeys: (show:boolean[]) => void,
+
+    onAddWallet: () => void;
+    onClearWallets: () => void;
+    onDeleteWallet: (index: number) => void;
+}
+
+export interface handleAddWalletProps {
+  mnemonicWords:string[],
+    pathTypes:string[],
+  wallets:Wallet[],
+  setWallets:(wallets: Wallet[]) => void,
+  visiblePrivateKeys: boolean[],
+  visiblePhrases:boolean[],
+
+  setVisiblePrivateKeys: (show: boolean[]) => void,
+  setVisiblePhrases: (show: boolean[]) => void,
+
 }
 // export const Wallet;

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import axios from 'axios'
 
 
 const page = () => {
@@ -19,11 +20,37 @@ const page = () => {
     const [ chain, setChain ] = useState<'sol' | 'eth'>('sol');
     const [ address, setAddress ]= useState("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [ error, setError ] = useState<string | null>(null);
+    const [ balance, setBalance ] = useState<string | null>(null);
 
 
 
-    const handleFetchBalance = ()=>{
+    const handleFetchBalance = async ()=>{
+        if(!address){
+            setError("please enter a wallet address.");
+            return;
+        }
 
+        setIsLoading(true);
+        setError(null);
+        setBalance(null);
+
+        try{
+
+            const response = await axios.post('/api/getBalance', {
+                address,
+                chain
+              });
+
+            const data = response.data;
+
+            setBalance(Number(data.balance).toFixed(6))
+        }
+        catch(e:any){
+            setError(e.message)
+        }finally{
+            setIsLoading(false);
+        }
 
     }
 
@@ -76,14 +103,38 @@ const page = () => {
                     <Button onClick={handleFetchBalance} disabled={isLoading} className="w-1/2">
                         {isLoading ? 'Checking...' : 'Check Balance'}
                     </Button>
+
+                </div>
+
+                <div className='pt-4 flex items-center'>
+                    {error &&
+                        <p>Error fetching balance </p>
+                     
+                    }
+                    {balance != null && 
+                    
+                        (
+                            <div>
+
+                                    <p className="text-lg text-gray-600 dark:text-gray-300">
+                                
+                                         Balance:
+                                    </p>
+                                    <p className="text-4xl font-bold">
+                                        {balance} <span className="text-2xl font-medium text-gray-500">{chain.toUpperCase()}</span>
+                                    </p>
+                            </div>
+                        )
+                    }
+
+
                 </div>
             </CardContent>
             <CardFooter>
-                <p>Card Footer</p>
+                {/* <p>Card Footer</p> */}
             </CardFooter>
             </Card>
         </div>
-   
     </>
   )
 }

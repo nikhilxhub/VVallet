@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 const GetBalance = () => {
 
     const router = useRouter();
-    const [ ]
+
 
   return (
     <div className='flex flex-row  gap-2 py-4 px-4 sm:px-10 md:px-20 self-end'>

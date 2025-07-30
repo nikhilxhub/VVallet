@@ -3,51 +3,48 @@
 import { NextResponse } from 'next/server';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
-// Define the structure of the incoming request body
+
 interface BalanceRequest {
   address: string;
   chain: 'eth' | 'sol';
+  network: 'mainnet' | 'devnet'; 
 }
 
 export async function POST(request: Request) {
   try {
-
-    const { address, chain }: BalanceRequest = await request.json();
+    const { address, chain, network }: BalanceRequest = await request.json();
     
-    if (!address || !chain) {
-      return NextResponse.json({ error: 'Address and chain are required' }, { status: 400 });
+    if (!address || !chain || !network) {
+      return NextResponse.json({ error: 'Address, chain, and network are required' }, { status: 400 });
     }
     
     let rpcUrl: string | undefined;
-    let payload;
     
-    // Configure the request based on the selected chain
     if (chain === 'eth') {
-      rpcUrl = process.env.ALCHEMY_ETHEREUM_RPC_URL;
-      payload = {
-        id: 1,
-        jsonrpc: '2.0',
-        method: 'eth_getBalance',
-        params: [address, 'latest'], 
-      };
+      rpcUrl = network === 'mainnet' 
+        ? process.env.ALCHEMY_ETHEREUM_RPC_URL 
+        : process.env.ALCHEMY_ETHEREUM_DEVNET_RPC_URL;
     } else if (chain === 'sol') {
-      rpcUrl = process.env.ALCHEMY_SOLANA_RPC_URL;
-      payload = {
-        id: 1,
-        jsonrpc: '2.0',
-        method: 'getBalance',
-        params: [address],
-      };
+      rpcUrl = network === 'mainnet'
+        ? process.env.ALCHEMY_SOLANA_RPC_URL
+        : process.env.ALCHEMY_SOLANA_DEVNET_RPC_URL;
     } else {
       return NextResponse.json({ error: 'Unsupported chain' }, { status: 400 });
     }
     
     if (!rpcUrl) {
-      console.error('RPC URL is not configured for the selected chain:', chain);
-      return NextResponse.json({ error: 'Server configuration error: RPC URL is missing.' }, { status: 500 });
+      console.error(`RPC URL is not configured for: ${chain} on ${network}`);
+      return NextResponse.json({ error: `Server configuration error: RPC URL is missing for ${network}.` }, { status: 500 });
     }
 
-    // Make the secure, server-to-server request to Alchemy
+ 
+    const payload = {
+      id: 1,
+      jsonrpc: '2.0',
+      method: chain === 'eth' ? 'eth_getBalance' : 'getBalance',
+      params: [address, ...(chain === 'eth' ? ['latest'] : [])],
+    };
+
     const alchemyResponse = await fetch(rpcUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -65,13 +62,10 @@ export async function POST(request: Request) {
     if (data.error) {
         return NextResponse.json({ error: `Node error: ${data.error.message}` }, { status: 400 });
     }
-
-    // --- ROBUST ERROR CHECKING ADDED HERE ---
     if (data.result == null) {
         return NextResponse.json({ error: 'Invalid address or no balance found.' }, { status: 404 });
     }
 
-    // Process the raw balance into a human-readable format
     let balance: number;
     if (chain === 'eth') {
       const balanceInWei = parseInt(data.result, 16);
@@ -80,7 +74,6 @@ export async function POST(request: Request) {
       }
       balance = balanceInWei / 1e18;
     } else { // Solana
-      // Check if the 'value' property exists and is a number
       if (typeof data.result.value !== 'number') {
         return NextResponse.json({ error: 'Invalid address or no balance found for this Solana account.' }, { status: 404 });
       }
@@ -88,7 +81,6 @@ export async function POST(request: Request) {
       balance = balanceInLamports / LAMPORTS_PER_SOL;
     }
 
-    // Send the final, processed balance back to the client
     return NextResponse.json({ balance });
 
   } catch (error) {

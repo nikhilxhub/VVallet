@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import axios from 'axios'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 
 const page = () => {
@@ -22,6 +23,7 @@ const page = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [ error, setError ] = useState<string | null>(null);
     const [ balance, setBalance ] = useState<string | null>(null);
+    const [ network, setNetwork ] = useState<'mainnet' | 'devnet'>('mainnet');
 
 
 
@@ -39,7 +41,8 @@ const page = () => {
 
             const response = await axios.post('/api/getBalance', {
                 address,
-                chain
+                chain,
+                network
               });
 
             const data = response.data;
@@ -71,7 +74,18 @@ const page = () => {
             <CardHeader>
                 <CardTitle className='text-2xl flex items-center font-bold'>Check your Balance</CardTitle>
                 <CardDescription>Via VVallet</CardDescription>
-                {/* <CardAction>Card Action</CardAction> */}
+                <CardAction> 
+                    <Select onValueChange={(value: 'mainnet' | 'devnet') => setNetwork(value)} 
+                                defaultValue={network}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Select a network" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="mainnet">Main-Net</SelectItem>
+                            <SelectItem value="devnet">Dev-Net</SelectItem>
+                        </SelectContent>
+                    </Select>
+            </CardAction>
             </CardHeader>
             <CardContent>
               
@@ -79,6 +93,8 @@ const page = () => {
                 {/* chain selection */}
 
                 <div className="flex justify-center gap-2 p-1 ">
+                   
+
                     <Button
                         size={"lg"}
                         onClick={() => setChain('sol')}
@@ -90,6 +106,11 @@ const page = () => {
                         onClick={() => setChain('eth')}
                         variant={chain === 'eth' ? 'default' : 'outline'}
                     >Ethereum</Button>
+
+                    
+
+                    
+
                 </div>
 
                 <div className="space-y-2 flex flex-col items-center-safe py-2">

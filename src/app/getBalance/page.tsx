@@ -60,7 +60,7 @@ const page = () => {
 
   return (
     <>
-    <NavBar />
+    {/* <NavBar /> */}
 
     <div className='flex flex-col justify-between  py-4 px-4 sm:px-10 md:px-20'>
             <h1 className='text-2xl md:text-4xl tracking-tight font-[900]'>Wallet Balance Checker</h1>

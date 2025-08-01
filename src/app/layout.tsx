@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
 import { Manrope } from "next/font/google";
 import { Toaster } from "sonner";
+import NavBar from "@/components/NavBar";
 const manrope = Manrope({ subsets: ["latin"] });
 
 // const geistSans = Geist({
@@ -38,6 +39,8 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Toaster />
+        <NavBar />
+
             {children}
           </ThemeProvider>
       </body>

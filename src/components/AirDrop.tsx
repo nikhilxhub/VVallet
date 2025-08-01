@@ -7,13 +7,15 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { copyToClipboard } from '@/utils/otherUtils';
 
 const SolanaAirdropController = () => {
     const { connection } = useConnection();
     const { connected, publicKey } = useWallet(); // Destructure publicKey here
     const [amount, setAmount] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [feedback, setFeedback] = useState('');
+    // const [feedback, setFeedback] = useState('');
+    const [feedback, setFeedback] = useState<React.ReactNode>('');
     
     // Get address from publicKey, handles null safely
     const address = publicKey?.toBase58();
@@ -44,7 +46,14 @@ const SolanaAirdropController = () => {
             // Wait for transaction confirmation
             // await connection.confirmTransaction(signature, 'confirmed');
 
-            setFeedback(`Airdrop of ${numericAmount} SOL successful! Transaction: ${signature}`);
+            // setFeedback(`Airdrop of ${numericAmount} SOL successful! <div>Transaction: ${signature}</div>`);
+
+            setFeedback(
+                <>
+                    Airdrop of {numericAmount} SOL successful!
+                    <div className= "cursor-pointer" onClick={() => copyToClipboard(signature)}>Transaction: {signature}</div>
+                </>
+            );
             setAmount(''); 
         } catch (error: any) {
             console.error(error);
@@ -62,14 +71,14 @@ const SolanaAirdropController = () => {
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center space-y-6 p-8">
                 {/* Solana Wallet Connection Button */}
-                <div className="w-full">
+                <div className="w-full flex justify-center">
                     <WalletMultiButton style={{ backgroundColor: '#9945FF', width: '100%', borderRadius: '0.5rem' }} />
                 </div>
 
                 {/* Airdrop UI (shown only when wallet is connected) */}
                 {connected && address ? (
                     <div className="text-center space-y-4 w-full pt-4">
-                        <p className="text-sm text-green-400 font-semibold">Wallet Connected!</p>
+                        <p className="text-sm  font-semibold">Wallet Connected!</p>
                         <p className="text-xs text-zinc-300 break-all bg-zinc-800 p-2 rounded-md">Address: {address}</p>
                         
                         <Input 
@@ -81,7 +90,7 @@ const SolanaAirdropController = () => {
                             disabled={isLoading}
                         />
 
-                        <Button onClick={handleClaimAirdrop} className="w-full bg-green-600 hover:bg-green-700" disabled={isLoading || !amount}>
+                        <Button onClick={handleClaimAirdrop} className="w-full " disabled={isLoading || !amount}>
                             {isLoading ? 'Processing...' : 'Claim Airdrop'}
                         </Button>
 

@@ -57,7 +57,7 @@ const SolanaAirdropController = () => {
             setAmount(''); 
         } catch (error: any) {
             console.error(error);
-            setFeedback(error.message || 'An error occurred during the airdrop.');
+            setFeedback('An error occurred during the airdrop.');
         } finally {
             setIsLoading(false);
         }
@@ -101,7 +101,7 @@ const SolanaAirdropController = () => {
                 )}
                 
                 {/* Feedback message area */}
-                {feedback && <p className="text-sm text-zinc-400 pt-4 text-center break-all">{feedback}</p>}
+                {feedback && <div className="text-sm text-zinc-400 pt-4 text-center break-all">{feedback}</div>}
             </CardContent>
         </Card>
     );

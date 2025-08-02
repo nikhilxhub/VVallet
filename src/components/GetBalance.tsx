@@ -13,6 +13,7 @@ const GetBalance = () => {
         <Button onClick={()=> router.push("/getBalance")}>get balance</Button>
         <Button onClick={()=> router.push("/getairDrop")}>get AirDrop</Button>
         <Button onClick={() => router.push("/createToken")}>create Token</Button>
+        <Button onClick={() => router.push("/sendSol")}>send solana</Button>
         {/* <Button></Button> */}
 
 

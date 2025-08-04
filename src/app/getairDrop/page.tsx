@@ -1,15 +1,11 @@
 "use client"
 import React, { useState, useMemo, FC } from 'react';
-import axios from 'axios'; 
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 
 
 import { ConnectionProvider, WalletProvider, useWallet } from '@solana/wallet-adapter-react';
-import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import NavBar from '@/components/NavBar';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+
 import SolanaAirdropController from '@/components/AirDrop';
 
 import '@solana/wallet-adapter-react-ui/styles.css';
@@ -41,8 +37,7 @@ const page = () => {
            <main className="flex items-center justify-center py-15 px-4">
                 <ConnectionProvider endpoint={SOLANA_RPC_ENDPOINT}>
                     <WalletProvider wallets={[]} autoConnect>
-                        <div>
-                        </div>
+
                         <WalletModalProvider>
                             <SolanaAirdropController />
                         </WalletModalProvider>

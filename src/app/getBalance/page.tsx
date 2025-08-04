@@ -73,7 +73,7 @@ const page = () => {
             <Card className='w-full max-w-2xl mx-auto rounded-lg'>
             <CardHeader>
                 <CardTitle className='text-2xl flex items-center font-bold'>Check your Balance</CardTitle>
-                <CardDescription>Via VVallet</CardDescription>
+                <CardDescription>Via Vaultory</CardDescription>
                 <CardAction> 
                     <Select onValueChange={(value: 'mainnet' | 'devnet') => setNetwork(value)} 
                                 defaultValue={network}>

@@ -109,7 +109,10 @@ const WalletGenerator = () => {
                     {pathTypes.length == 0 && (
                         <div className='flex flex-col'> 
                             <div className='flex flex-col gap-2'>
-                                <h1 className='text-4xl tracking-tighter font-[900]'>VVALLET Supports multiple blockChains</h1>
+                                <h1 className='text-4xl tracking-tighter font-[900]'>All-in-One</h1>
+                                <h1 className='text-4xl tracking-tighter font-[900]'>Crypto Wallet for a</h1>
+                                <h1 className='text-4xl tracking-tighter font-[900]'>Decentralized Future</h1>
+                                {/* <h1 className='text-4xl tracking-tighter font-[400]'>VVALLET Supports multiple blockChains</h1> */}
                                 <p className='text-primary/80 font-semibold'>Choose a BlockChain to get Started </p>
                             </div>
 

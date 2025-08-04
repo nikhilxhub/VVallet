@@ -63,6 +63,8 @@ const SendSol = () => {
     }
 
     return (
+        <>
+        
         <Card className="w-full max-w-md bg-zinc-900 border-zinc-700 text-white">
             <CardHeader>
                 <CardTitle className="text-2xl font-bold">Send SOL</CardTitle>
@@ -71,7 +73,7 @@ const SendSol = () => {
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center space-y-6 p-6">
-                <div className="w-full">
+                <div className="center">
                     <WalletMultiButton style={{ backgroundColor: '#9945FF', width: '100%', borderRadius: '0.5rem' }} />
                 </div>
                 
@@ -114,6 +116,8 @@ const SendSol = () => {
                 )}
             </CardContent>
         </Card>
+
+        </>
     );
 };
 

@@ -9,7 +9,7 @@ const NavBar = () => {
         
         <div className='flex gap-2'><WalletMinimal className='size-10' />
         
-        <p className='text-4xl'>VVallet</p>
+        <p className='text-4xl text-[#D5D7C2] font-[700]'>Vaultory</p>
         
         </div>
     

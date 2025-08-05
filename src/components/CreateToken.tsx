@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
-import { Keypair, PublicKey } from '@solana/web3.js'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { Keypair, PublicKey, SendTransactionError, SystemProgram, Transaction } from '@solana/web3.js'
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { toast } from 'sonner'
@@ -15,14 +15,14 @@ import { createInitializeInstruction, pack } from "@solana/spl-token-metadata"
 const CreateToken = () => {
 
     const [ feedback, setFeedback ] = useState("");
-    const { publicKey,wallet } = useWallet();
+    const { publicKey ,sendTransaction } = useWallet();
 
     const [ tokenName, setTokenName ] = useState("");
     const [ isLoading, sestIsLoading ] = useState(false);
     const [ tokenSymbol, setTokenSymbol ] = useState("");
     const [ tokenImage, setTokenImage ] = useState("");
     const [ tokenSupply, setTokenSupply ] = useState("");
-
+    const { connection } = useConnection();
 
     //need to upload metadata to pinata..
     const uploadMetaData = async () =>{
@@ -32,7 +32,7 @@ const CreateToken = () => {
         // should upload via pinata
     }
 
-    const createToken = ()=>{
+    const createToken = async ()=>{
         if(!publicKey){
             return toast.warning("Wallet not connected");
         }
@@ -58,7 +58,72 @@ const CreateToken = () => {
             const mintLen = getMintLen([ExtensionType.MetadataPointer]);
             const metadataLen = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length;
 
+            const lamports = await connection.getMinimumBalanceForRentExemption(mintLen);
+           
+            //transaction-1
+            const transaction = new Transaction().add(
+                SystemProgram.createAccount({
+                    fromPubkey: publicKey,
+                    newAccountPubkey: mintKeyPair.publicKey,
+                    space: mintLen,
+                    lamports,
+                    programId: TOKEN_2022_PROGRAM_ID,
+                }),
+                //INSTRUCTION-2:
+                createInitializeMetadataPointerInstruction(mintKeyPair.publicKey, publicKey, mintKeyPair.publicKey, TOKEN_2022_PROGRAM_ID),
 
+                //INSTRUCTION-3
+                createInitializeMintInstruction(mintKeyPair.publicKey, 9, publicKey, null, TOKEN_2022_PROGRAM_ID),
+
+                //INSTRUCTION-4
+                createInitializeInstruction({
+                    programId: TOKEN_2022_PROGRAM_ID,
+                    mint: mintKeyPair.publicKey,
+                    metadata: mintKeyPair.publicKey,
+                    name: metadata.name,
+                    symbol: metadata.symbol,
+                    uri: metadata.uri,
+                    mintAuthority: publicKey,
+                    updateAuthority: publicKey,
+
+                }),
+
+                
+                
+            )
+            //fee payer is wallet connected one
+            transaction.feePayer = publicKey;
+            transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+            transaction.partialSign(mintKeyPair);
+
+            const sign = await sendTransaction(transaction,connection);
+            toast.success("Token mint created");
+
+            const associatedToken = getAssociatedTokenAddressSync(
+                mintKeyPair.publicKey,
+                publicKey,
+                false,
+                TOKEN_2022_PROGRAM_ID
+            );
+
+            //TRANSACTION-2
+
+            const transaction2 = new Transaction().add(
+                createAssociatedTokenAccountInstruction(
+                    publicKey,
+                    associatedToken,
+                    publicKey,
+                    mintKeyPair.publicKey,
+                    TOKEN_2022_PROGRAM_ID
+                ),
+                createMintToInstruction(mintKeyPair.publicKey,associatedToken,publicKey, 1000000000, [], TOKEN_2022_PROGRAM_ID)
+
+            );
+
+        }catch(e){
+            toast.error("Some Error while creating token")
+        }finally{
+            sestIsLoading(false);
         }
 
 

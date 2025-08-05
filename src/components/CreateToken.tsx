@@ -1,15 +1,21 @@
 import React, { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
-import { PublicKey } from '@solana/web3.js'
+import { Keypair, PublicKey } from '@solana/web3.js'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
+import { toast } from 'sonner'
+
+import { createAssociatedTokenAccountInstruction, createInitializeMetadataPointerInstruction, createInitializeMintInstruction, createMintToInstruction, ExtensionType, getAssociatedTokenAddressSync, getMintLen, LENGTH_SIZE, TOKEN_2022_PROGRAM_ID, TYPE_SIZE } from "@solana/spl-token"
+import { createInitializeInstruction, pack } from "@solana/spl-token-metadata"
+
+
 
 const CreateToken = () => {
 
     const [ feedback, setFeedback ] = useState("");
-    const { publicKey } = useWallet();
+    const { publicKey,wallet } = useWallet();
 
     const [ tokenName, setTokenName ] = useState("");
     const [ isLoading, sestIsLoading ] = useState(false);
@@ -18,9 +24,42 @@ const CreateToken = () => {
     const [ tokenSupply, setTokenSupply ] = useState("");
 
 
+    //need to upload metadata to pinata..
+    const uploadMetaData = async () =>{
 
+
+
+        // should upload via pinata
+    }
 
     const createToken = ()=>{
+        if(!publicKey){
+            return toast.warning("Wallet not connected");
+        }
+
+        sestIsLoading(true);
+        try{
+            const mintKeyPair = Keypair.generate();
+
+            let metadataUri = await uploadMetaData();
+
+            if(!metadataUri){
+                return toast.warning("Failed to upload metadata.");
+            }
+
+            const metadata = {
+                mint: mintKeyPair.publicKey,
+                name: tokenName,
+                symbol: tokenSymbol,
+                uri: metadataUri,
+                additionalMetadata: [],
+            };
+
+            const mintLen = getMintLen([ExtensionType.MetadataPointer]);
+            const metadataLen = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length;
+
+
+        }
 
 
     }

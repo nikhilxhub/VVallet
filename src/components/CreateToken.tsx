@@ -1,206 +1,129 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
-import { Keypair, PublicKey, SendTransactionError, SystemProgram, Transaction } from '@solana/web3.js'
-import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { Input } from './ui/input'
-import { Button } from './ui/button'
-import { toast } from 'sonner'
+"use client";
 
-import { createAssociatedTokenAccountInstruction, createInitializeMetadataPointerInstruction, createInitializeMintInstruction, createMintToInstruction, ExtensionType, getAssociatedTokenAddressSync, getMintLen, LENGTH_SIZE, TOKEN_2022_PROGRAM_ID, TYPE_SIZE } from "@solana/spl-token"
-import { createInitializeInstruction, pack } from "@solana/spl-token-metadata"
+import React, { useMemo, useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
+import { toast } from 'sonner';
+import axios from 'axios';
 
 
+import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
+import { walletAdapterIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
+import { createFungible, mintV1, mplTokenMetadata, TokenStandard } from '@metaplex-foundation/mpl-token-metadata';
+
+import { generateSigner, some, percentAmount } from '@metaplex-foundation/umi';
 
 const CreateToken = () => {
-
-    const [ feedback, setFeedback ] = useState("");
-    const { publicKey ,sendTransaction } = useWallet();
-
-    const [ tokenName, setTokenName ] = useState("");
-    const [ isLoading, sestIsLoading ] = useState(false);
-    const [ tokenSymbol, setTokenSymbol ] = useState("");
-    const [ tokenImage, setTokenImage ] = useState("");
-    const [ tokenSupply, setTokenSupply ] = useState("");
     const { connection } = useConnection();
+    const wallet = useWallet();
 
-    //need to upload metadata to pinata..
-    const uploadMetaData = async () =>{
+    const [tokenName, setTokenName] = useState("");
+    const [tokenSymbol, setTokenSymbol] = useState("");
+    const [tokenImage, setTokenImage] = useState("");
+    const [tokenDescription, setTokenDescription] = useState("");
+    const [tokenSupply, setTokenSupply] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
+    const umi = useMemo(() => 
+        createUmi(connection.rpcEndpoint)
+            .use(walletAdapterIdentity(wallet))
+            .use(mplTokenMetadata()),
+        [connection, wallet]
+    );
 
-
-        // should upload via pinata
-    }
-
-    const createToken = async ()=>{
-        if(!publicKey){
-            return toast.warning("Wallet not connected");
+    const uploadMetadata = async (): Promise<string | null> => {
+        if (tokenName.length > 32 || tokenSymbol.length > 10 || tokenName.length === 0 || tokenSymbol.length === 0) {
+            toast.error("Name must be 1-32 chars & Symbol must be 1-10 chars.");
+            return null;
         }
+        try {
+            const { data } = await axios.post('/api/upload', {
+                name: tokenName, symbol: tokenSymbol, image: tokenImage, description: tokenDescription,
+            });
+            return data.uri;
+        } catch (e) {
+            toast.error("Failed to upload metadata.");
+            return null;
+        }
+    };
 
-        sestIsLoading(true);
-        try{
-            const mintKeyPair = Keypair.generate();
+    const createToken = async () => {
+        if (!wallet.publicKey) return toast.warning("Wallet not connected");
+        const supply = Number(tokenSupply);
+        if (isNaN(supply) || supply <= 0) return toast.warning("Please enter a valid token supply.");
 
-            let metadataUri = await uploadMetaData();
+        setIsLoading(true);
+        const promise = async (): Promise<string> => {
+            const metadataUri = await uploadMetadata();
+            if (!metadataUri) throw new Error("Metadata upload failed");
+            
+            const mint = generateSigner(umi);
+            const decimals = 9;
 
-            if(!metadataUri){
-                return toast.warning("Failed to upload metadata.");
-            }
-
-            const metadata = {
-                mint: mintKeyPair.publicKey,
+            await createFungible(umi, {
+                mint,
                 name: tokenName,
                 symbol: tokenSymbol,
                 uri: metadataUri,
-                additionalMetadata: [],
-            };
-
-            const mintLen = getMintLen([ExtensionType.MetadataPointer]);
-            const metadataLen = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length;
-
-            const lamports = await connection.getMinimumBalanceForRentExemption(mintLen);
-           
-            //transaction-1
-            const transaction = new Transaction().add(
-                SystemProgram.createAccount({
-                    fromPubkey: publicKey,
-                    newAccountPubkey: mintKeyPair.publicKey,
-                    space: mintLen,
-                    lamports,
-                    programId: TOKEN_2022_PROGRAM_ID,
-                }),
-                //INSTRUCTION-2:
-                createInitializeMetadataPointerInstruction(mintKeyPair.publicKey, publicKey, mintKeyPair.publicKey, TOKEN_2022_PROGRAM_ID),
-
-                //INSTRUCTION-3
-                createInitializeMintInstruction(mintKeyPair.publicKey, 9, publicKey, null, TOKEN_2022_PROGRAM_ID),
-
-                //INSTRUCTION-4
-                createInitializeInstruction({
-                    programId: TOKEN_2022_PROGRAM_ID,
-                    mint: mintKeyPair.publicKey,
-                    metadata: mintKeyPair.publicKey,
-                    name: metadata.name,
-                    symbol: metadata.symbol,
-                    uri: metadata.uri,
-                    mintAuthority: publicKey,
-                    updateAuthority: publicKey,
-
-                }),
-
                 
-                
-            )
-            //fee payer is wallet connected one
-            transaction.feePayer = publicKey;
-            transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-            transaction.partialSign(mintKeyPair);
+                sellerFeeBasisPoints: percentAmount(0), 
+                decimals: some(decimals),
+            }).sendAndConfirm(umi, { send: { skipPreflight: true } });
+            
+            const amountToMint = BigInt(supply * (10 ** decimals));
+            await mintV1(umi, {
+                mint: mint.publicKey,
+                authority: umi.identity,
+                amount: amountToMint,
+                tokenOwner: umi.identity.publicKey,
+                tokenStandard: TokenStandard.Fungible,
+            }).sendAndConfirm(umi, { send: { skipPreflight: true } });
 
-            const sign = await sendTransaction(transaction,connection);
-            toast.success("Token mint created");
+            return `https://explorer.solana.com/address/${mint.publicKey.toString()}?cluster=devnet`;
+        };
 
-            const associatedToken = getAssociatedTokenAddressSync(
-                mintKeyPair.publicKey,
-                publicKey,
-                false,
-                TOKEN_2022_PROGRAM_ID
-            );
+        toast.promise(promise(), {
+            loading: 'Creating and minting token...',
+            success: (link) => (
+                <div className="flex flex-col">
+                    <span>Token created successfully!</span>
+                    <a href={link} target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">
+                        View Token on Explorer
+                    </a>
+                </div>
+            ),
+            error: (err) => `Error: ${err.message}`,
+            finally: () => setIsLoading(false),
+        });
+    };
 
-            //TRANSACTION-2
-
-            const transaction2 = new Transaction().add(
-                createAssociatedTokenAccountInstruction(
-                    publicKey,
-                    associatedToken,
-                    publicKey,
-                    mintKeyPair.publicKey,
-                    TOKEN_2022_PROGRAM_ID
-                ),
-                createMintToInstruction(mintKeyPair.publicKey,associatedToken,publicKey, 1000000000, [], TOKEN_2022_PROGRAM_ID)
-
-            );
-
-        }catch(e){
-            toast.error("Some Error while creating token")
-        }finally{
-            sestIsLoading(false);
-        }
-
-
-    }
-
-
-
-
-
-  return (
-            <>
-        
+    return (
         <Card className="w-full max-w-md bg-zinc-900 border-zinc-700 text-white">
             <CardHeader>
-                <CardTitle className="text-2xl font-bold">Create Token</CardTitle>
-                <CardDescription className="text-zinc-400">
-                    Connect your wallet.
-                </CardDescription>
+                <CardTitle className="text-2xl font-bold">Create Token (Final Version)</CardTitle>
+                <CardDescription className="text-zinc-400">Using the modern Umi library for reliability.</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center space-y-6 p-6">
-                <div className="center">
-                    <WalletMultiButton style={{ backgroundColor: '#9945FF', width: '100%', borderRadius: '0.5rem' }} />
-                </div>
+            <CardContent className="flex flex-col items-center justify-center space-y-4 p-6">
+                <WalletMultiButton style={{ backgroundColor: '#9945FF', width: '100%', borderRadius: '0.5rem' }} />
                 
-                {PublicKey && (
+                {wallet.publicKey && (
                     <div className="w-full space-y-4 pt-4 text-center">
-                         <p className="text-xs text-zinc-300 break-all bg-zinc-800 p-2 rounded-md">
-                            Your Address: {publicKey?.toBase58()}
-                        </p>
-
-                        <Input type='text'
-                                value = {tokenName}
-                                onChange={(e) => setTokenName(e.target.value)}
-                                placeholder='Enter Token Name'
-                                disabled={isLoading}
-                                
-                            />
-                        <Input type='text'
-                                value = {tokenSymbol}
-                                onChange={(e) => setTokenSymbol(e.target.value)}
-                                placeholder='Enter Token Symbol'
-                                disabled={isLoading}
-                                
-                            />
-                        <Input type='text'
-                                value = {tokenImage}
-                                onChange={(e) => setTokenImage(e.target.value)}
-                                placeholder='https://catWithHat.png'
-                                disabled={isLoading}
-                                
-                            />
-                        <Input type='number'
-                                value = {tokenSupply}
-                                onChange={(e) => setTokenSupply(e.target.value)}
-                                placeholder='100'
-                                disabled={isLoading}
-                                
-                            />
-
-                        <Button
-                            onClick={(createToken)}
-                            disabled={ isLoading || !tokenName|| !tokenSymbol || !tokenSupply }
-                            className="w-full"
-                        >
-                            {isLoading ? "creating..." : "Create Token"}
+                        <Input value={tokenName} onChange={(e) => setTokenName(e.target.value)} placeholder="Token Name (e.g. My Token)" disabled={isLoading} />
+                        <Input value={tokenSymbol} onChange={(e) => setTokenSymbol(e.target.value)} placeholder="Token Symbol (e.g. MYT)" disabled={isLoading} />
+                        <Input value={tokenImage} onChange={(e) => setTokenImage(e.target.value)} placeholder="Token Image URL" disabled={isLoading} />
+                        <Input value={tokenDescription} onChange={(e) => setTokenDescription(e.target.value)} placeholder="Description (Optional)" disabled={isLoading} />
+                        <Input type='number' value={tokenSupply} onChange={(e) => setTokenSupply(e.target.value)} placeholder="Total Supply" disabled={isLoading} />
+                        <Button onClick={createToken} disabled={isLoading || !tokenName || !tokenSymbol || !tokenImage || !tokenSupply} className="w-full bg-green-600 hover:bg-green-700">
+                            {isLoading ? "Creating..." : "Create Token"}
                         </Button>
-                        
                     </div>
                 )}
-
-                {feedback && <p className="text-sm text-zinc-400 pt-4 text-center break-all">{feedback}</p>}
-                
             </CardContent>
         </Card>
+    );
+};
 
-        </>
-  )
-}
-
-export default CreateToken
+export default CreateToken;

@@ -9,6 +9,8 @@ import '@solana/wallet-adapter-react-ui/styles.css';
 
 const SOLANA_RPC_ENDPOINT = process.env.ALCHEMY_SOLANA_DEVNET_RPC_URL || "https://api.devnet.solana.com";
 
+console.log(SOLANA_RPC_ENDPOINT);
+
 const page = () => {
 
   return (

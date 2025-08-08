@@ -11,6 +11,8 @@ import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import { walletAdapterIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
 import { mplTokenMetadata, TokenStandard, transferV1 } from '@metaplex-foundation/mpl-token-metadata';
 import { publicKey } from '@metaplex-foundation/umi';
+import bs58 from 'bs58';
+
 
 
 const SendToken = () => {
@@ -38,7 +40,7 @@ const SendToken = () => {
             try {
                 const amountInSmallestUnit = BigInt(Number(tokenAmount) * (10 ** decimals));
                 
-                // --- FIX: Use Umi's `publicKey()` helper for all addresses ---
+                
                 const mint = publicKey(tokenMintAddress);
                 const destinationOwner = publicKey(recipientAddress);
 
@@ -51,7 +53,9 @@ const SendToken = () => {
                     tokenStandard: TokenStandard.Fungible,
                 }).sendAndConfirm(umi, { send: { skipPreflight: true } });
                 
-                return Buffer.from(transferTx.signature).toString('base64');
+                // return Buffer.from(transferTx.signature).toString('base64');
+
+                return bs58.encode(transferTx.signature);
             } catch (error: any) {
                 throw new Error(error.message || "An unexpected error occurred during transfer.");
             }

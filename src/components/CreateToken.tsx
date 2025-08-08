@@ -103,11 +103,11 @@ const CreateToken = () => {
     return (
         <Card className="w-full max-w-md bg-zinc-900 border-zinc-700 text-white">
             <CardHeader>
-                <CardTitle className="text-2xl font-bold">Create Token (Final Version)</CardTitle>
+                <CardTitle className="text-2xl font-bold">Create Token</CardTitle>
                 <CardDescription className="text-zinc-400">Using the modern Umi library for reliability.</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center space-y-4 p-6">
-                <WalletMultiButton style={{ backgroundColor: '#9945FF', width: '100%', borderRadius: '0.5rem' }} />
+            <CardContent className="flex flex-col items-center justify-center space-y-2 p-6">
+                {/* <WalletMultiButton style={{ backgroundColor: '#9945FF', width: '100%', borderRadius: '0.5rem' }} /> */}
                 
                 {wallet.publicKey && (
                     <div className="w-full space-y-4 pt-4 text-center">
@@ -116,7 +116,7 @@ const CreateToken = () => {
                         <Input value={tokenImage} onChange={(e) => setTokenImage(e.target.value)} placeholder="Token Image URL" disabled={isLoading} />
                         <Input value={tokenDescription} onChange={(e) => setTokenDescription(e.target.value)} placeholder="Description (Optional)" disabled={isLoading} />
                         <Input type='number' value={tokenSupply} onChange={(e) => setTokenSupply(e.target.value)} placeholder="Total Supply" disabled={isLoading} />
-                        <Button onClick={createToken} disabled={isLoading || !tokenName || !tokenSymbol || !tokenImage || !tokenSupply} className="w-full bg-green-600 hover:bg-green-700">
+                        <Button onClick={createToken} disabled={isLoading || !tokenName || !tokenSymbol || !tokenImage || !tokenSupply} className="w-full">
                             {isLoading ? "Creating..." : "Create Token"}
                         </Button>
                     </div>

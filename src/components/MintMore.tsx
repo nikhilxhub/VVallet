@@ -12,7 +12,7 @@ import { walletAdapterIdentity } from '@metaplex-foundation/umi-signer-wallet-ad
 import { mplTokenMetadata, TokenStandard, mintV1 } from '@metaplex-foundation/mpl-token-metadata';
 
 import { publicKey } from '@metaplex-foundation/umi';
-
+import bs58 from "bs58"
 
 const MintMore = () => {
     const { connection } = useConnection();
@@ -38,7 +38,6 @@ const MintMore = () => {
             try {
                 const amountInSmallestUnit = BigInt(Number(tokenAmount) * (10 ** decimals));
 
-                // --- FIX: Use Umi's `publicKey()` helper instead of `new PublicKey()` ---
                 const mintAddressAsUmiPublicKey = publicKey(tokenMintAddress);
 
                 const mintTx = await mintV1(umi, {
@@ -49,7 +48,9 @@ const MintMore = () => {
                     tokenStandard: TokenStandard.Fungible,
                 }).sendAndConfirm(umi, { send: { skipPreflight: true } });
 
-                return Buffer.from(mintTx.signature).toString('base64');
+                // return Buffer.from(mintTx.signature).toString('base64');
+
+                return bs58.encode(mintTx.signature);
             } catch (error: any) {
                 throw new Error(error.message || "An unexpected error occurred while minting.");
             }

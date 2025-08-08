@@ -5,6 +5,7 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import React from 'react'
 import '@solana/wallet-adapter-react-ui/styles.css';
 import MintMore from '@/components/MintMore'
+import SendToken from '@/components/SendToken'
 
 
 
@@ -29,6 +30,7 @@ const page = () => {
               <WalletModalProvider>
                 <CreateToken />
                 {/* <MintMore /> */}
+                {/* <SendToken /> */}
               </WalletModalProvider>
             </WalletProvider>
           </ConnectionProvider>

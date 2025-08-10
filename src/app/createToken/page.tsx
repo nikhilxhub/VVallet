@@ -1,12 +1,11 @@
 "use client"
 import React, { useState } from 'react';
 
-// Your functional component imports
+
 import CreateToken from '@/components/CreateToken';
 import MintMore from '@/components/MintMore';
 import SendToken from '@/components/SendToken';
 
-// 1. Import Shadcn/ui components that we just added
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
@@ -14,6 +13,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import '@solana/wallet-adapter-react-ui/styles.css';
+import { SwapToken } from '@/components/SwapToken';
 
 // Define the type for our active component keys
 type ActiveComponent = 'create' | 'mint' | 'send';
@@ -89,6 +89,7 @@ const Page = () => {
                     {activeComponent === 'create' && <CreateToken />}
                     {activeComponent === 'mint' && <MintMore />}
                     {activeComponent === 'send' && <SendToken />}
+                    {/* {activeComponent === 'send' && <SwapToken />} */}
                   {/* </CardContent>
                 </Card> */}
 

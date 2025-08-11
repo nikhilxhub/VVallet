@@ -16,7 +16,7 @@ import '@solana/wallet-adapter-react-ui/styles.css';
 import { SwapToken } from '@/components/SwapToken';
 
 // Define the type for our active component keys
-type ActiveComponent = 'create' | 'mint' | 'send';
+type ActiveComponent = 'create' | 'mint' | 'send' | 'swap';
 
 const SOLANA_RPC_ENDPOINT = process.env.NEXT_PUBLIC_ALCHEMY_SOLANA_DEVNET_RPC_URL || "https://api.devnet.solana.com";
 
@@ -30,6 +30,9 @@ const componentInfo: Record<ActiveComponent, { title: string }> = {
   },
   send: {
     title: "Send Your Tokens"
+  },
+  swap:{
+    title:"Swap Your Tokens"
   }
 };
 
@@ -69,6 +72,9 @@ const Page = () => {
             <ToggleGroupItem value="send" aria-label="Toggle send">
               Send Token
             </ToggleGroupItem>
+            <ToggleGroupItem value="swap" aria-label="Toggle swap">
+              Swap Token
+            </ToggleGroupItem>
           </ToggleGroup>
 
           {/* Wallet and Connection Providers */}
@@ -89,7 +95,7 @@ const Page = () => {
                     {activeComponent === 'create' && <CreateToken />}
                     {activeComponent === 'mint' && <MintMore />}
                     {activeComponent === 'send' && <SendToken />}
-                    {/* {activeComponent === 'send' && <SwapToken />} */}
+                    {activeComponent === 'swap' && <SwapToken />}
                   {/* </CardContent>
                 </Card> */}
 

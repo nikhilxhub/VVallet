@@ -16,6 +16,7 @@ import { SwapToken } from '@/components/SwapToken';
 type ActiveComponent = 'create' | 'mint' | 'send' | 'swap';
 
 const SOLANA_RPC_ENDPOINT = process.env.NEXT_PUBLIC_ALCHEMY_SOLANA_DEVNET_RPC_URL || "https://api.devnet.solana.com";
+const SOLANA_MAINET_ENDPOINT = process.env.NEXT_PUBLIC_ALCHEMY_SOLANA_RPC_URL;
 
 
 
@@ -61,6 +62,7 @@ const Page = () => {
           </ToggleGroup>
 
           {/* Wallet and Connection Providers */}
+          {/* SHOULD ADD MAIN NET ENDPOINT */}
           <ConnectionProvider endpoint={SOLANA_RPC_ENDPOINT}>
             <WalletProvider wallets={[]} autoConnect>
               <WalletModalProvider>

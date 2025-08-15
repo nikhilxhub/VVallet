@@ -1,5 +1,5 @@
 import { Token } from '@/types/Token';
-import React from 'react'
+// import React from 'react'
 import SwapTokenClient from './SwapTokenClient';
 
 const SwapTokenServer = async() => {
@@ -19,6 +19,7 @@ const SwapTokenServer = async() => {
     console.error("failed to fetch token list on server:", e);
 
   }
+  console.log("fetching tokens:....");
 
   return (
     <SwapTokenClient serverTokens={tokens} />

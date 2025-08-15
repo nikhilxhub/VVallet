@@ -12,6 +12,8 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import { SwapToken } from '@/components/SwapToken';
+import SwapTokenClient from '@/components/SwapTokenClient';
+import SwapTokenServer from '@/components/SwapTokenServer';
 
 type ActiveComponent = 'create' | 'mint' | 'send' | 'swap';
 
@@ -72,7 +74,8 @@ const Page = () => {
                     {activeComponent === 'create' && <CreateToken />}
                     {activeComponent === 'mint' && <MintMore />}
                     {activeComponent === 'send' && <SendToken />}
-                    {activeComponent === 'swap' && <SwapToken />}
+                    {activeComponent === 'swap' && <SwapTokenClient />}
+                    {/* {activeComponent === 'swap' && <SwapToken />} */}
 
 
               </WalletModalProvider>

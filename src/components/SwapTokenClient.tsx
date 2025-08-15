@@ -1,13 +1,15 @@
+"use client"
 import { Token } from '@/types/Token'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Label } from '@radix-ui/react-dropdown-menu'
 import { Input } from './ui/input'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { Select, SelectContent, SelectTrigger, SelectValue } from '@radix-ui/react-select'
-import { SelectItem } from './ui/select'
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowDownUp } from 'lucide-react'
 import { Button } from './ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 
 const SwapTokenClient = ({ serverTokens }: {
   serverTokens?: Token[]
@@ -18,6 +20,8 @@ const SwapTokenClient = ({ serverTokens }: {
   const { publicKey } = wallet;
 
   const [tokens, setTokens] = useState<Token[]>(serverTokens ?? []);
+  console.log("im here")
+  console.log("fetched tokens count ", tokens?.length);
 
   const [ inputAmount, setInputAmount ] = useState<string>("0");
   const [ inputToken, setInputToken ] = useState<string>('So11111111111111111111111111111111111111112');
@@ -28,14 +32,43 @@ const SwapTokenClient = ({ serverTokens }: {
   const [ swapping, setSwapping ] = useState(false);
 
   const [ quote, setQuote ] = useState<any>(null);
-  
+
+  const [ slippageBps, setSlippageBps ]= useState<number>(50);
+
+
+  useEffect(() => {
+    if (tokens.length === 0) {
+      (async () => {
+        try {
+          const res = await fetch('https://token.jup.ag/strict');
+          const tokenList = await res.json();
+          setTokens(tokenList);
+        } catch (err) {
+          console.error('Failed to fetch token list (client fallback):', err);
+        }
+      })();
+    }
+  }, [tokens.length]);
+
+  //add debounce fetch quote when input amount changing
+  useEffect(() =>{
+
+  },[inputAmount, inputToken, outputToken,slippageBps])
+
 
 
 
 
   const handleFlip = () =>{
+
+    const tmpToken = inputToken;
+    const tmpAmount = inputAmount;
+    setInputToken(outputToken);
+    setOutputToken(tmpToken);
+    setInputAmount(outputAmount || '0');
+    setOutputAmount(tmpAmount);
     
-  }
+  };
 
   const handleSwap = () =>{
 
@@ -45,13 +78,13 @@ const SwapTokenClient = ({ serverTokens }: {
 
   return (
 
-    <Card>
+    <Card className="w-full max-w-md mx-auto">
       <CardHeader><CardTitle>Jupiter Swap</CardTitle></CardHeader>
 
-      <CardContent>
+      <CardContent className="space-y-4">
         <div>
           <Label>You Pay</Label>
-          <div>
+          <div className='flex space-x-2'>
 
             <Input
               id="input-amount"
@@ -72,7 +105,7 @@ const SwapTokenClient = ({ serverTokens }: {
 
         <div>
           <Label>You Receive</Label>
-          <div>
+          <div className='flex space-x-2'>
             <Input id = "output-amount" type= "text" value={loading ? 'Loading...' : outputAmount} readOnly placeholder='0.0' 
               className='flex-grow'
             />
@@ -108,17 +141,24 @@ function TokenSelector({
 
   const selected = tokens.find((t) => t.address == selectedToken);
 
+  const TokenChip = (t: Token | undefined) => (
+    <div className="flex items-center space-x-2">
+      <Avatar className="h-6 w-6">
+        {/* Guard logoURI to avoid empty src warnings */}
+        <AvatarImage src={t?.logoURI || undefined} alt={t?.name || 'token'} />
+        <AvatarFallback>{(t?.symbol || '?').slice(0,3).toUpperCase()}</AvatarFallback>
+      </Avatar>
+      <span>{t?.symbol || 'Token'}</span>
+    </div>
+  );
   return (
 
     <>
       <Select value={selectedToken} onValueChange={onSelectToken}>
-        <SelectTrigger>
+        <SelectTrigger className='w-[150px]'>
           <SelectValue placeholder="Select Token">
             {selected ? (
-              <div>
-                <img src={selected.logoURI} alt={selected.name} className='w-6 h-6 rounder-full' loading='lazy' />
-                <span>{selected.symbol}</span>
-              </div>
+              TokenChip(selected)
             ) : 'Select Token'}
 
           </SelectValue>
@@ -128,8 +168,10 @@ function TokenSelector({
 
             <SelectItem key={t.address} value={t.address}>
               <div className='flex items-center space-x-2'>
-                <img src={t.logoURI} alt={t.name} className='w-6 h-6 rounder-full' loading='lazy' />
-                <span>{t.symbol}</span>
+              <Avatar className="h-6 w-6">
+                <AvatarImage src={t.logoURI || undefined} alt={t.name} />
+                <AvatarFallback>{t.symbol.slice(0,3).toUpperCase()}</AvatarFallback>
+              </Avatar>
 
               </div>
 

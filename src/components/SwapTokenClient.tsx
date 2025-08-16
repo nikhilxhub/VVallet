@@ -53,10 +53,25 @@ const SwapTokenClient = ({ serverTokens }: {
   //add debounce fetch quote when input amount changing
   useEffect(() =>{
 
+    const h = setTimeout(() =>{
+
+      if(parseFloat(inputAmount) > 0 && inputToken && outputToken){
+        getQuote();
+      }else{
+        setOutputAmount('');
+        setQuote(null);
+
+      }
+    }, 500);
+
+    return () => clearTimeout(h);
+
   },[inputAmount, inputToken, outputToken,slippageBps])
 
 
-
+  async function getQuote() {
+    
+  }
 
 
   const handleFlip = () =>{
@@ -71,6 +86,8 @@ const SwapTokenClient = ({ serverTokens }: {
   };
 
   const handleSwap = () =>{
+
+
 
 
   }

@@ -1,6 +1,6 @@
 "use client"
 import { Token } from '@/types/Token'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Label } from '@radix-ui/react-dropdown-menu'
 import { Input } from './ui/input'
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowDownUp } from 'lucide-react'
 import { Button } from './ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { toast } from 'sonner'
 
 const SwapTokenClient = ({ serverTokens }: {
   serverTokens?: Token[]
@@ -50,6 +51,13 @@ const SwapTokenClient = ({ serverTokens }: {
     }
   }, [tokens.length]);
 
+
+  const rpcEndpoint = (connection as any)?.rpcEndpoint ?? (connection as any)?._rpcEndpoint ?? '';
+  const isDevOrTest = typeof rpcEndpoint === 'string' && (rpcEndpoint.includes('devnet') || rpcEndpoint.includes('testnet'));
+
+  const inputTokenInfo = useMemo(() => tokens.find((t) => t.address === inputToken), [tokens, inputToken]);
+  const outputTokenInfo = useMemo(() => tokens.find((t) => t.address === outputToken), [tokens, outputToken]);
+
   //add debounce fetch quote when input amount changing
   useEffect(() =>{
 
@@ -70,6 +78,29 @@ const SwapTokenClient = ({ serverTokens }: {
 
 
   async function getQuote() {
+
+    if(isDevOrTest){
+      setQuote(null);
+      setOutputAmount('');
+      console.warn("detected devnet");
+      toast.error("Dev-net detected.");
+      return;
+    }
+
+    if(!inputTokenInfo || !outputTokenInfo || !parseFloat(inputAmount)) return;
+
+    setLoading(true);
+    setOutputAmount('');
+
+    try{
+
+
+    }catch(e){
+      console.error("getQuote error:", e);
+      toast.error("Error getting quote.");
+    }finally{
+      setLoading(false);
+    }
     
   }
 

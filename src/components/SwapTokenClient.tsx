@@ -11,6 +11,10 @@ import { ArrowDownUp } from 'lucide-react'
 import { Button } from './ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { toast } from 'sonner'
+import { createJupiterApiClient, QuoteGetRequest } from '@jup-ag/api'
+
+
+const jupiterApi = createJupiterApiClient();
 
 const SwapTokenClient = ({ serverTokens }: {
   serverTokens?: Token[]
@@ -93,6 +97,23 @@ const SwapTokenClient = ({ serverTokens }: {
     setOutputAmount('');
 
     try{
+      const amountInSmallestUnit = new BigNumber(inputAmount).shiftedBy(inputTokenInfo.decimals).integerValue().toString();
+      const quoteParams: QuoteGetRequest = {
+        inputMint: inputToken,
+        outputMint: outputToken,
+        amount: parseInt(amountInSmallestUnit),
+        slippageBps,
+      };
+
+      const newQuote = await jupiterApi.quoteGet(quoteParams);
+
+      if(newQuote){
+        const outputAmount = new BigNumber(newQuote.outAmount).shiftedBy(-outputTokenInfo.decimals).toString();
+        setOutputAmount(outputAmount);
+        setQuote(newQuote);
+      }else{
+        toast.error("No quote found for this pair.");
+      }
 
 
     }catch(e){

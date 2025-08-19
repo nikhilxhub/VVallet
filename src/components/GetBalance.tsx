@@ -12,7 +12,7 @@ const GetBalance = () => {
     <div className='flex flex-row  gap-2 py-4 px-4 sm:px-10 md:px-20 self-end'>
         <Button onClick={()=> router.push("/getBalance")}>get balance</Button>
         <Button onClick={()=> router.push("/getairDrop")}>get AirDrop</Button>
-        <Button onClick={() => router.push("/createToken")}>create Token</Button>
+        <Button onClick={() => router.push("/createToken")}>Token</Button>
         <Button onClick={() => router.push("/sendSol")}>send solana</Button>
         {/* <Button></Button> */}
 

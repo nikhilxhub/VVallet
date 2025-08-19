@@ -11,7 +11,9 @@ import { ArrowDownUp } from 'lucide-react'
 import { Button } from './ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { toast } from 'sonner'
-import { createJupiterApiClient, QuoteGetRequest } from '@jup-ag/api'
+import { createJupiterApiClient, QuoteGetRequest, SwapPostRequest } from '@jup-ag/api'
+import { VersionedTransaction } from '@solana/web3.js'
+import { signTransaction } from '@metaplex-foundation/umi'
 
 
 const jupiterApi = createJupiterApiClient();
@@ -22,7 +24,7 @@ const SwapTokenClient = ({ serverTokens }: {
 
   const { connection } = useConnection();
   const wallet = useWallet();
-  const { publicKey } = wallet;
+  const { publicKey, signTransaction } = wallet;
 
   const [tokens, setTokens] = useState<Token[]>(serverTokens ?? []);
   console.log("im here")
@@ -137,9 +139,74 @@ const SwapTokenClient = ({ serverTokens }: {
     
   };
 
+  const base64ToBuffer = (b64: string) => Buffer.from(b64, 'base64');
+
+
   async function tryVersionedSwap(): Promise<boolean>{
 
     try{
+      if(!publicKey){
+        return false;
+      }
+      const swapParams: SwapPostRequest = {
+        swapRequest: {
+          quoteResponse: quote,
+          userPublicKey: publicKey.toBase58(),
+          wrapAndUnwrapSol: true,
+        } as any,
+      };
+
+      const { swapTransaction } = await jupiterApi.swapPost(swapParams);
+
+      const txBuf = base64ToBuffer(swapTransaction);
+
+      const vtx = VersionedTransaction.deserialize(txBuf);
+
+      if (!signTransaction) {
+        throw new Error("Wallet not connected or signTransaction is undefined.");
+      }
+      const signed = await signTransaction(vtx);
+      const raw = signed.serialize();
+
+      // Send transaction
+      const txid = await connection.sendRawTransaction(raw, {
+        skipPreflight: true,
+        maxRetries: 2,
+      });
+
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+
+
+
+      const confirmation = await connection.confirmTransaction(
+        {
+          signature: txid,
+          blockhash,
+          lastValidBlockHeight,
+        },
+        'confirmed' // commitment goes here, as the second argument
+      );
+
+      if (confirmation?.value?.err) {
+        throw new Error(JSON.stringify(confirmation.value.err));
+      }
+
+      toast.success(
+        <div className="flex flex-col">
+          <span>Swap successful!</span>
+          <a
+            href={`https://solscan.io/tx/${txid}`}
+            target="_blank"
+            rel="noreferrer"
+            className="text-blue-500 hover:underline"
+          >
+            View on Solscan
+          </a>
+        </div>
+      );
+
+
+
 
 
       return true;

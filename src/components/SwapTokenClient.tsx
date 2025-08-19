@@ -137,7 +137,55 @@ const SwapTokenClient = ({ serverTokens }: {
     
   };
 
-  const handleSwap = () =>{
+  async function tryVersionedSwap(): Promise<boolean>{
+
+    try{
+
+
+      return true;
+    }catch(e){
+
+      console.warn("Version swap attempt failed..Your wallet doesn't support")
+
+      return false;
+    }
+  }
+
+  const handleSwap = async () =>{
+    if(!publicKey){
+      toast.error("Please connect your wallet.");
+      return;
+
+    }
+    if(!quote){
+      toast.error("No quote available.");
+      return;
+    }
+
+    if(isDevOrTest){
+      toast.error("Jupiter swap is not available for dev-net");
+      return;
+    }
+
+    setSwapping(true);
+
+    try{
+
+      const succeded = await tryVersionedSwap();
+      if(!succeded){
+        throw new Error("Swap failed due to wallet adapter(VersionedTx)");
+      }
+
+
+    }catch(e){
+      console.error("Swap error: ",e);
+      toast.error("Swap failed.See console for details.");
+
+    }finally{
+
+      setSwapping(false);
+      getQuote();
+    }
 
 
 

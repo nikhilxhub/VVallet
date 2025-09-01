@@ -24,6 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 // Token interface
 interface Token {
@@ -245,6 +246,45 @@ export function SwapToken() {
 }
 
 // A simple token selector component
+// function TokenSelector({
+//   tokens,
+//   selectedToken,
+//   onSelectToken,
+// }: {
+//   tokens: Token[];
+//   selectedToken: string;
+//   onSelectToken: (tokenAddress: string) => void;
+// }) {
+//   const selectedTokenInfo = tokens.find((t) => t.address === selectedToken);
+
+//   return (
+//     <Select value={selectedToken} onValueChange={onSelectToken}>
+//       <SelectTrigger className="w-[150px]">
+//         <SelectValue placeholder="Select Token">
+//           {selectedTokenInfo ? (
+//             <div className="flex items-center space-x-2">
+//               <img src={selectedTokenInfo.logoURI} alt={selectedTokenInfo.name} className="w-6 h-6 rounded-full" />
+//               <span>{selectedTokenInfo.symbol}</span>
+//             </div>
+//           ) : (
+//             'Select Token'
+//           )}
+//         </SelectValue>
+//       </SelectTrigger>
+//       <SelectContent>
+//         {tokens.map((token) => (
+//           <SelectItem key={token.address} value={token.address}>
+//             <div className="flex items-center space-x-2">
+//               <img src={token.logoURI} alt={token.name} className="w-6 h-6 rounded-full" />
+//               <span>{token.symbol}</span>
+//             </div>
+//           </SelectItem>
+//         ))}
+//       </SelectContent>
+//     </Select>
+//   );
+// }
+
 function TokenSelector({
   tokens,
   selectedToken,
@@ -252,34 +292,57 @@ function TokenSelector({
 }: {
   tokens: Token[];
   selectedToken: string;
-  onSelectToken: (tokenAddress: string) => void;
-}) {
-  const selectedTokenInfo = tokens.find((t) => t.address === selectedToken);
+  onSelectToken: (addr: string) => void;
 
-  return (
-    <Select value={selectedToken} onValueChange={onSelectToken}>
-      <SelectTrigger className="w-[150px]">
-        <SelectValue placeholder="Select Token">
-          {selectedTokenInfo ? (
-            <div className="flex items-center space-x-2">
-              <img src={selectedTokenInfo.logoURI} alt={selectedTokenInfo.name} className="w-6 h-6 rounded-full" />
-              <span>{selectedTokenInfo.symbol}</span>
-            </div>
-          ) : (
-            'Select Token'
-          )}
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        {tokens.map((token) => (
-          <SelectItem key={token.address} value={token.address}>
-            <div className="flex items-center space-x-2">
-              <img src={token.logoURI} alt={token.name} className="w-6 h-6 rounded-full" />
-              <span>{token.symbol}</span>
-            </div>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+}) {
+
+  const selected = tokens.find((t) => t.address == selectedToken);
+
+  const TokenChip = (t: Token | undefined) => (
+    <div className="flex items-center space-x-2">
+      <Avatar className="h-6 w-6">
+        {/* Guard logoURI to avoid empty src warnings */}
+        <AvatarImage src={t?.logoURI || undefined} alt={t?.name || 'token'} />
+        <AvatarFallback>{(t?.symbol || '?').slice(0,3).toUpperCase()}</AvatarFallback>
+      </Avatar>
+      <span>{t?.symbol || 'Token'}</span>
+    </div>
   );
+  return (
+
+    <>
+      <Select value={selectedToken} onValueChange={onSelectToken}>
+        <SelectTrigger className='w-[150px]'>
+          <SelectValue placeholder="Select Token">
+            {selected ? (
+              TokenChip(selected)
+            ) : 'Select Token'}
+
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {tokens.map((t) => (
+
+            <SelectItem key={t.address} value={t.address}>
+              <div className='flex items-center space-x-2'>
+              <Avatar className="h-6 w-6">
+                <AvatarImage src={t.logoURI || undefined} alt={t.name} />
+                <AvatarFallback>{t.symbol.slice(0,3).toUpperCase()}</AvatarFallback>
+              </Avatar>
+
+              </div>
+
+            </SelectItem>
+          ))}
+        </SelectContent>
+
+
+
+
+      </Select>
+
+    </>
+  )
+
+
 }

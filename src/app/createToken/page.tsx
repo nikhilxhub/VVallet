@@ -45,6 +45,10 @@ const Page = () => {
             <p className='text-primary/80 font-semibold'>Via Vaultory On Solana Blockchain</p>
           </div>
           <Button
+          variant={'outline'}
+
+        className="text-white border-amber-500 hover:bg-amber-500 hover:text-amber-500 transition-all duration-300 shadow-amber-500/30 hover:shadow-md"
+
               onClick={() => setNetwork(network === 'devnet' ? 'mainnet' : 'devnet')}
             >
               Switch to {network === 'devnet' ? 'Mainnet' : 'Devnet'}
@@ -90,8 +94,8 @@ const Page = () => {
                     {activeComponent === 'create' && <CreateToken />}
                     {activeComponent === 'mint' && <MintMore />}
                     {activeComponent === 'send' && <SendToken />}
-                    {activeComponent === 'swap' && <SwapTokenClient />}
-                    {/* {activeComponent === 'swap' && <SwapToken />} */}
+                    {/* {activeComponent === 'swap' && <SwapTokenClient />} */}
+                    {activeComponent === 'swap' && <SwapToken />}
 
 
               </WalletModalProvider>

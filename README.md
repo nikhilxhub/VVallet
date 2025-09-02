@@ -56,7 +56,7 @@ npm run dev
 
 🔧 Environment Variables
 
-Create a .env.local file in the project root and add:
+Create a .env file in the project root and add:
 
 # Ethereum RPC
 ALCHEMY_ETHEREUM_RPC_URL=

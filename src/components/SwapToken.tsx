@@ -232,6 +232,42 @@ export function SwapToken() {
           </div>
         </div>
 
+        {/* Slippage */}
+        <div className="space-y-2">
+          <Label>Slippage Tolerance</Label>
+          <div className="flex items-center space-x-2">
+            <Input
+              type="number"
+              min={0.1}
+              max={50}
+              step={0.1}
+              value={(slippageBps / 100).toString()}
+              onChange={(e) => {
+                const value = parseFloat(e.target.value);
+                if (!isNaN(value)) {
+                  setSlippageBps(Math.round(value * 100));
+                }
+              }}
+              className="w-20 text-center"
+            />
+            <span className="text-sm text-muted-foreground">%</span>
+
+            <div className="flex space-x-2">
+              {[0.5, 1, 5].map((percent) => (
+                <Button
+                  key={percent}
+                  variant={slippageBps === percent * 100 ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSlippageBps(percent * 100)}
+                >
+                  {percent}%
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+
         {/* Swap Button */}
         <Button
           onClick={handleSwap}
